@@ -1,0 +1,95 @@
+#!/bin/sh
+
+
+help(){
+	usage
+	echo -e "\nFull GoBuster runthrough"
+	echo -e "Created to do a full runthrough of gobuster with common wordlists"
+	echo -e "\n"
+	echo -e "Options:"
+	echo -e "\t-d\tdir\tURL"
+	echo -e "\t-n\tdns\tDomain"
+	echo -e "\t-h\thelp"
+	echo -e "\t-v\tversion\n"
+	echo -e "For more details please code more"
+	version
+}
+
+version(){
+	echo -n "Version 0.0.1"
+}
+
+usage(){
+	echo -e "Usage: $(basename $0) [-hv] [-dn [URL]] " 1>&2 
+	#basename makes sure it doesn't have all the directories associated with it
+	#e.g. Go-Bust rather than ~/Script/Go/Go-Bust
+}
+
+abnorm_inp(){
+	usage
+	exit 0
+}
+
+dir(){
+	echo -e "Dir"
+	URL=${OPTARG}
+	for wordl in ${DIRWordlists[*]}
+		do
+			$GoLoc dir -u $URL -w "${SeccLoc}${DirLoc}/${wordl}"
+			#echo -e "$out"
+		done
+	echo -e "Complete"
+
+}
+dns(){
+	echo -e "DNS"
+	Domain=${OPTARG}
+	for wordl in ${DNSWordlists[*]}
+		do
+			$GoLoc dns -d $Domain -w "${SeccLoc}${DNSLoc}/${wordl}"
+			#echo -e "$URL"
+		done
+	echo -e "Complete\n"
+}
+
+
+GoLoc="GoBuster location" #Removed for security
+SeccLoc="The Location of SecLists" #Removed for security
+DirLoc="/Discovery/Web-Content"
+DNSLoc="/Discovery/DNS"
+PassLoc="/Passwords"
+declare -a DIRWordlists
+DIRWordlists=( common.txt RobotsDisallowed-Top1000.txt )
+declare -a DNSWordlists
+DNSWordlists=( namelist.txt subdomains-top1million-110000.txt )
+#URL="127.0.0.1"
+
+echo -e "Go-Bust"
+while getopts "d:n:hv" options; do #Using getopts for options, no : if no argument
+	case "${options}" in                        
+	    d) dir ;;
+		n) dns ;;
+		h) help ;;
+		v) version ;;
+	    :)                                         
+	      echo "Error: -${OPTARG} requires an argument."
+	      abnorm_inp                            
+	      ;;
+	    *)
+	    	abnorm_inp                                         
+	      ;;
+  	esac
+done
+
+#alias gobust="~/Afnom/gobuster/gobuster-3.0.1/gobuster"
+#alias seccommon="cat ~/Afnom/SecLists/Discovery/Web-Content/common.txt"
+#{
+#        seccom=~/Afnom/SecLists/Discovery/Web-Content/common.txt
+#        if [ $3 == 'seccom' ]
+#        then
+#                ~/Afnom/gobuster/gobuster-3.0.1/gobuster "$1" -u "$2" -w "$seccom"
+#        else
+#                ~/Afnom/gobuster/gobuster-3.0.1/gobuster "$1" -u "$2" -w "$3"
+#        fi
+#}
+#alias sqlmap="python ~/Afnom/tools/sqlmap-dev/sqlmap.py"

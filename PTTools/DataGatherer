@@ -1,0 +1,117 @@
+#!/bin/sh
+
+<<Comments
+What this script should do
+1. Be transported through an SSH connection if necessary
+2. Display basic data about the system with commands used on most systems
+3. Check for other commands that are not usually found/ need to be installed
+4. Do extra checks if those commands exist
+
+Ways to get the operating system
+uname -a
+cat /etc/os-release
+cat /etc/release # SVR4, Solaris
+cat /etc/redhat-release
+cat /etc/*elease
+cat /etc/lsb-release
+oslevel -r # AIX
+system_profiler -detailLevel -2 # Mac OS/X
+
+Sending to other systems:
+echo hello >/dev/tcp/localhost/6502
+nc -l -p 6502
+scp - secure copy
+example:
+scp Script user@host:~
+ssh user@host bash ./Script
+scp user@192.168.1.100:/tmp/myfile /tmp/files/myfile
+
+Ways to get a package
+different ones for the system but 
+ls /bin | grep "<packagename>"" works well for most
+
+Check if an active ssh connection exists:
+ss | grep -i ssh
+who
+w
+https://www.golinuxcloud.com/list-check-active-ssh-connections-linux/
+
+Check if there is an environment variable called:
+$SSH_CLIENT OR $SSH_CONNECTION
+(or any other environment variables) which gets set when the user logs in. Then process it using the user login script.
+Extract the IP:
+$ echo $SSH_CLIENT | awk '{ print $1}'
+1.2.3.4
+$ echo $SSH_CONNECTION | awk '{print $1}'
+1.2.3.4
+
+Comments
+
+cmdsearch=(firefox lsscsi hdparm dmidecode neofetch)
+
+operatingsystem(){
+	echo -e "----OS Data----"
+	uname -a
+	cat /etc/*elease
+}
+
+filesearch(){
+	searchterm=$1
+	search=$(ls /bin | grep $searchterm)
+	echo $search
+}
+
+enter(){
+	echo -e "Press ctrl + C to exit, or"
+	read -p "Press enter to continue..."
+	clear
+	#read -n 1 -s -r -p "Press any key to continue"
+}
+listinfo(){
+	clear
+	operatingsystem
+	enter
+	echo -e "----CPU Data----"
+	lscpu
+	enter
+	echo "----USB Data----"
+	lsusb
+	enter
+	echo "----Device Data----"
+	lsblk
+	enter
+	echo "----PCI Data----"
+	lspci
+	enter
+}
+
+sudochecker(){
+	ls
+	#sudo -l -if sudo capable, shows all commands you can run
+	#groups <username>
+	#users
+	#getent group <groupname>
+	#getent group -Shows you all groups
+}
+
+cmdchecker(){
+	for i in $cmdsearch; 
+	do
+		filesearch $i
+	done
+}
+infodisplay(){
+	listinfo
+	cmdchecker
+	
+}
+
+#Setup a connection to transfer this file through to a connected host via SSH
+if [[ $1 == "-c" ]] && [[ $2 != "" ]]; then
+	scp $0 "$2:~"
+	echo $SSH_CLIENT
+	echo $2
+fi
+
+#operatingsystem
+#geteinfodisplay

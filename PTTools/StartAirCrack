@@ -1,0 +1,65 @@
+#!/bin/sh
+
+opts="snrchv"
+
+help(){
+	usage
+	echo -e "\nFull Airmon runthrough"
+	echo -e "Created to initialise aircrack without typing a bunch of commands"
+	echo -e "\n"
+	echo -e "Options:"
+	echo -e "\t-s\tstart"
+	echo -e "\t-n\tstop"
+	echo -e "\t-c\tscan"
+	echo -e "\t-h\thelp"
+	echo -e "\t-v\tversion\n"
+	echo -e "For more details please code more"
+	version
+}
+
+version(){
+	echo -n "Version 0.0.1"
+}
+
+usage(){ 
+	echo -e "Usage: $(basename $0) [$opts] " 1>&2 
+}
+
+abnorm_inp(){ 
+	usage
+	exit 0
+}
+
+start(){ 
+	ip a
+	sudo airmon-ng start wlp3s0 
+}
+stop(){
+	sudo airmon-ng stop wlp3s0mon
+}
+scan(){
+	ip a
+	sudo airodump-ng wlp3s0mon
+}
+crack(){
+	sudo aircrack-ng -w $1 hand.cap
+}
+
+echo -e "Aircrack-Bash"
+while getopts "$opts" options; do #Using getopts for options, no : if no argument
+	case "${options}" in                        
+	    s) start ;;
+		n) stop ;;
+		c) scan ;;
+		h) help ;;
+		r) crack ;;
+		v) version ;;
+	    :)                                         
+	      echo "Error: -${OPTARG} requires an argument."
+	      abnorm_inp                            
+	      ;;
+	    *)
+	    	abnorm_inp                                         
+	      ;;
+  	esac
+done
