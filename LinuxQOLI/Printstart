@@ -1,0 +1,29 @@
+#!/bin/sh
+
+
+<<Comments
+Starting up the printer
+Comments
+
+start(){
+echo -e "Starting up printing";
+sudo systemctl enable cups.service;
+sudo systemctl start cups.service;
+echo -e "Remember to go to http://localhost:631/";
+}
+
+end(){
+echo -e "Ending printing";
+sudo systemctl stop cups.service;
+sudo systemctl disable cups.service;
+
+}
+
+echo -e "Printing"
+while getopts "se" options; do #Using getopts for options, no : if no argument
+	case "${options}" in                        
+	    s) start ;;
+		e) end ;;
+	    \?) start;;
+  	esac
+done

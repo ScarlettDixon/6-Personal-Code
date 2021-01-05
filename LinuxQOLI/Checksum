@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#This script will do all the checking of SHA and other hashes to ensure no foul play occured
+
+shachoice="sha1\nsha224\nsha256\nsha512\nmd5"
+
+sha=$(echo -e "$shachoice" | dmenu -i)
+
+case "$sha" in #Extra brackets added in to ensure the filename isn't inputed
+	sha1)   hashed=($(sha1sum $1));;
+	sha224) hashed=($(sha224sum $1));;
+	sha256) hashed=($(sha256sum $1));;
+	sha512) hashed=($(sha512sum $1));;
+	md5)	hashed=($(md5sum $1));;
+	*) exit;;
+esac
+
+
+echo "Hash of the file is $hashed"
+echo "The Hash given is   $2"
+
+if [[ $hashed == $2 ]]; then echo "Secure" ; else echo "Insecure" ; fi

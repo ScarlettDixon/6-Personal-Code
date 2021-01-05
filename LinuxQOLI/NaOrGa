@@ -1,0 +1,12 @@
+#!/bin/sh
+
+#A script to choose between using nano or gaps
+
+choice=$(echo -e "Nano\nGedit" | dmenu -i -p "Nano or Gedit")
+
+#echo $choice
+
+if [[ $choice == "Nano" ]]; then nano $1;
+elif [[ $choice == "Gedit" ]]; then gedit $1;
+else exit;
+fi

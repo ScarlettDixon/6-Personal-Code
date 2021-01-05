@@ -1,0 +1,23 @@
+#!/bin/sh
+
+
+#Code to add extra displays easily
+choices="HMDILeft\nHDMIRight\nHDMISwitch\nVGALeft\nVGARight\nVGASwitch\nBackeDP"
+#Manual
+
+chosen=$(echo -e "$choices" | dmenu -i)
+
+
+case "$chosen" in
+	HMDILeft) xrandr --output HDMI1 --auto --left-of eDP1;;
+	HDMIRight) xrandr --output HDMI1 --auto --right-of eDP1;;
+	HDMISwitch) xrandr --output HDMI1 --auto --output eDP1 --off;;
+	VGALeft) xrandr --output VGA1 --auto --left-of eDP1;;
+	VGARight) xrandr --output VGA1 --auto --right-of eDP1 ;;
+	VGASwitch) xrandr --output VGA1 --auto --output eDP1 --off;;
+	BackeDP) xrandr --output eDP1 --auto  --output HDMI1 --off --output VGA1 --off ;;
+esac
+#alias dualscreenstart="xrandr --auto"
+#alias dualscreenright="xrandr --output HDMI1 --right-of eDP1" #Usually HDMI1 and eDP1 as input
+#alias dualscreenleft="xrandr --output HDMI1 --left-of eDP1" #Usually HDMI1 and eDP1 as input
+#alias dualscreenstop="xrandr --output HDMI1 --off"
