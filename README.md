@@ -30,14 +30,16 @@ A piece of software designed for a client that takes in dimensions of a cube/cub
 * Defaults for all above options
 
 ##### RPiNAT - 
-I have been interested in developing my networking skills in a more practical sense and wanted a server box I could test on the go, to do this, my main issue with this is I would need to discover my server and take a screen every time I wanted it to connect to a new network to be able to discover the new IP. My idea was to
+I have been interested in developing my networking skills in a more practical sense and wanted a server box I could test on the go, to do this, my main issue with this is I would need to discover my server and take a screen every time I wanted it to connect to a new network to be able to discover the new IP. My idea was create a service that would run when the device was powered on. This service would either have connect to a known network with a fixed address (which would generally be the home network or other trusted sources) or it would turn itself into a network, becoming an access point that I could then connect to. Work is unfortunately not finished but I am learning a lot about services in the process.
 
 ---
 ### Pentesting tools - 
 These quick scripts were made to make pentesting easier during competitions or when otherwise training, use of common tools like gobuster or wireshark can be forgotten even after a small time has passed and so having a shorthand can be extremely useful. They Include:
 ##### Datagatherer - 
+I was aware that this script might never be useful in actual pentesting but I created it to try to gain an understanding of the commands necessary to gather data on a system.
 ##### Go-Bust - 
 Scrubbed of the pathways for security. A way of automating gobuster that takes common wordlists from the secclist package and runs them against a specified IP or website. Future improvements include more options for use and finding out a way to make pathways flexible rather than fixed.
-##### StartAirCrak
+##### StartAirCrak - 
+Because the process of setting up Aircrack is so specific, this code was used to initialise or terminate the program.
 
 
