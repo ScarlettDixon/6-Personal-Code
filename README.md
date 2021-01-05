@@ -16,13 +16,13 @@ They include:
 Whether completed for myself or others,these projects contain multiple files and so deserved their own section, at this time some projects will be mentioned but not included due to them either not being completed or because of security concerns.
 They include:
 ###### Mapper- A piece of software designed for a client that takes in dimensions of a cube/cuboid and outputs a map that they can cut out and use, initially developed just to take in the three dimensions, it was later developed to include added features such as:
-A GUI for ease of use
-Centimetre and Inch options
-Tab options on the edge of the box for stability when glueing
-Being able to save the output image into multiple formats
-Having a circle on the back to be able to cut out (a feature the client asked for)
-Setting the DPI of the image to match up to whatever the client is using
-Defaults for all above options
+* A GUI for ease of use
+* Centimetre and Inch options
+* Tab options on the edge of the box for stability when glueing
+* Being able to save the output image into multiple formats
+* Having a circle on the back to be able to cut out (a feature the client asked for)
+* Setting the DPI of the image to match up to whatever the client is using
+* Defaults for all above options
 ###### RPiNAT - At the time, I was interested in developing my networking skills in a more practical sense and wanted a box I could test on the go, to do this, my idea was to look into linux services and ------
 
 ---
