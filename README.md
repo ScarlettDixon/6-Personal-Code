@@ -30,7 +30,7 @@ A piece of software designed for a client that takes in dimensions of a cube/cub
 * Defaults for all above options
 
 ##### RPiNAT - 
-I have been interested in developing my networking skills in a more practical sense and wanted a server box I could test on the go, to do this, my main issue with this is I would need to discover my server and take a screen every time I wanted it to connect to a new network to be able to discover the new IP. My idea was create a service that would run when the device was powered on. This service would either have connect to a known network with a fixed address (which would generally be the home network or other trusted sources) or it would turn itself into a network, becoming an access point that I could then connect to. Work is unfortunately not finished but I am learning a lot about services in the process.
+I have been interested in developing my networking skills in a more practical sense and wanted a server box I could test on the go. To do this normally I would need to take a screen every time as connecting to the new network means being able to discover the server's new IP which is impossible on some systems without tripping security defences. My idea was to create a service that would run when the device was powered on. This service would either connect to a known network with a pre-determined fixed address (which would generally be the home network or other trusted sources) or it would turn itself into a network, becoming an access point that I could then connect to. Work is unfortunately not finished but I am learning a lot about services in the process.
 
 ---
 ### Pentesting tools - 
