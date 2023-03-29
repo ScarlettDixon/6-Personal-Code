@@ -99,6 +99,7 @@ def PlayList(args):
     print(f'-------Ingesting playlist url-----------')
     playlist = Playlist(args.playlistlink)
     failed = []
+    #print(playlist.title)
     for videourls in playlist:
         print(videourls)
         CurrentVideo = Video(videourls, args.filelocation)
@@ -110,8 +111,6 @@ def PlayList(args):
     if (failed):
         outputPath: str = getattr(args, 'filelocation')
         FailedWrite(failed, outputPath)
-
-    #https://www.youtube.com/playlist?list=PLYp8CYBmmepGysjynkun2OOVTWrux-m2s
 
 def FailedWrite(failed, outputPath):
     header = []
