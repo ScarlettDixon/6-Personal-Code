@@ -160,6 +160,8 @@ python3 -m venv venv
 source venv/bin/activate - Starting venv
 pip install <PackageName>
 pip install -r requirements.txt
+Issues can be caused by none up to date packages, stop this by doing the following:
+python -m pip install --upgrade pytube & python -m pip install --upgrade pip
 python3 -m pip list --format=freeze > requirements.txt
 python -m pip cache remove <Pattern>
 deactivate
