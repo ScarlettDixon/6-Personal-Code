@@ -11,6 +11,7 @@ from csv import writer
 #from pyyoutube import Api
 
 class Video:
+    #Initialiser of Video class
     def __init__ (self,link, fileoutputlocation):
         self.link = link
         self.filelocation = fileoutputlocation
@@ -19,18 +20,25 @@ class Video:
         self.video = YouTube(link)
         self.GetDetails()
         self.Link()
+    #Attempts to gather the information necessary for successful download and later conversion
     def GetDetails(self):
         try:
             self.title = self.video.title
             print(f'-------Downloading {self.title}-----------')
             self.author = self.video.author
-            self.thumbnail = self.video.thumbnail_url
             self.description = self.video.description
+            try:
+                self.thumbnail = self.video.thumbnail_url 
+            except Exception as e:
+                self.error = "Failed to gather thumbnail - " + f"{e}"
+                print(self.error)
+                self.currentFailed = [self.link,'' ,'', self.error]
         except Exception as e:
             self.error = "Failed to gather details - " + f"{e}"
             print(self.error)
             self.currentFailed = [self.link,'' ,'', self.error]
             return
+    #Processing each individual link
     def Link(self):
         print(f'-------Audio Only Streams-----------')
         try:
@@ -47,7 +55,7 @@ class Video:
             print(self.error)
             if not (self.currentFailed):
                 self.currentFailed = [self.link, self.title ,self.author, self.error]
-        
+    #Converting from MP3 to MP4, both in file and metadata    
     def AudioConvert(self, VideoOut):
         try:
             print(f'-------Converting to MP3-----------')
@@ -67,7 +75,7 @@ class Video:
             if not (self.currentFailed):
                 self.currentFailed = [self.link, self.title ,self.author, self.error]
             return VideoOut
-        
+    #Using mutagen to add the MP3 metadata
     def MetadataAddition(self, AudioOut):
         print(f'-------Adding Metadata-----------')
         audio = ID3(AudioOut)
@@ -94,24 +102,28 @@ class Video:
                 self.currentFailed = [self.link, self.title ,self.author, self.error]
         #print(f"2: {audio}")
     
-
+#Seperate function to deal with playlists (many succesive links)
 def PlayList(args):
     print(f'-------Ingesting playlist url-----------')
     playlist = Playlist(args.playlistlink)
     failed = []
-    #print(playlist.title)
-    for videourls in playlist:
-        print(videourls)
-        CurrentVideo = Video(videourls, args.filelocation)
-        if (CurrentVideo.currentFailed):
-            failed.append(CurrentVideo.currentFailed)
-            print(f'{CurrentVideo.currentFailed}')
-        del CurrentVideo
-    print(f'-------Playlist Injestion Succesfull-----------')
+    print(playlist)
+    if (playlist): #Some issues can occur when youtube changes its access and encoding
+        for videourls in playlist:
+            print(videourls)
+            CurrentVideo = Video(videourls, args.filelocation)
+            if (CurrentVideo.currentFailed):
+                failed.append(CurrentVideo.currentFailed)
+                print(f'{CurrentVideo.currentFailed}')
+            del CurrentVideo
+        print(f'-------Playlist Injestion Succesfull-----------')
+    else:
+        print("Either playlist is empty or something has gone wrong")
     if (failed):
         outputPath: str = getattr(args, 'filelocation')
         FailedWrite(failed, outputPath)
 
+#Created in the event of failure in any area of the playlist script as it may contain many videos and allows a user to manually go back through and fix these issues
 def FailedWrite(failed, outputPath):
     header = []
     if not header:
@@ -123,7 +135,7 @@ def FailedWrite(failed, outputPath):
         failedWriter.writerow(header)
         failedWriter.writerows(failed)
 
-
+#Argument parsing
 if __name__ == '__main__':
     print("Scarlett's Youtube Downloader")
     parser = ArgumentParser("Youtube Video Downloader")
