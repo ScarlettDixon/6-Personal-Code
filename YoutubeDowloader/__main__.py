@@ -12,14 +12,16 @@ from csv import writer
 
 class Video:
     #Initialiser of Video class
-    def __init__ (self,link, fileoutputlocation):
+    def __init__ (self,link, fileoutputlocation, auth):
         self.link = link
         self.filelocation = fileoutputlocation
         self.currentFailed = []
         self.error = ""
-        self.video = YouTube(link)
+        if auth:
+            self.video = YouTube(link, use_oauth=True, allow_oauth_cache=True)
+        else:
+            self.video = YouTube(link)
         self.GetDetails()
-        self.Link()
     #Attempts to gather the information necessary for successful download and later conversion
     def GetDetails(self):
         try:
@@ -33,6 +35,7 @@ class Video:
                 self.error = "Failed to gather thumbnail - " + f"{e}"
                 print(self.error)
                 self.currentFailed = [self.link,'' ,'', self.error]
+            self.Link()
         except Exception as e:
             self.error = "Failed to gather details - " + f"{e}"
             print(self.error)
@@ -63,12 +66,17 @@ class Video:
             #print(f'{base} and {ext}')
             Oldfile = base + '.mp4'
             NewFile = base + '.mp3'
-            os.system(f'ffmpeg -vn -sn -dn -i "{Oldfile}" -codec:a libmp3lame -qscale:a 4 "{NewFile}" 2>/dev/null 1>/dev/null')
-            #ffmpeg -vn -sn -dn -i input.mp4 -codec:a libmp3lame -qscale:a 4 output.mp3
-            #os.rename(VideoOut, NewFile)
-            os.remove(VideoOut)
-            print(f'-------Convertion Successful-----------')
-            self.MetadataAddition(NewFile)
+            AlreadyExists= os.path.isfile(NewFile) #Ensures that issues don't occur when two mp3s exist in the same space with the same name
+            if not (AlreadyExists):
+                os.system(f'ffmpeg -vn -sn -dn -i "{Oldfile}" -codec:a libmp3lame -qscale:a 4 "{NewFile}" 2>/dev/null 1>/dev/null')
+                #ffmpeg -vn -sn -dn -i input.mp4 -codec:a libmp3lame -qscale:a 4 output.mp3
+                #os.rename(VideoOut, NewFile)
+                os.remove(VideoOut)
+                print(f'-------Convertion Successful-----------')
+                self.MetadataAddition(NewFile)
+            else:
+                print(f"File already exists, skipping")
+                os.remove(VideoOut)
         except Exception as e:
             self.error = "Failed audio conversion - " + f"{e}"
             print(self.error)
@@ -107,12 +115,13 @@ def PlayList(args):
     print(f'-------Ingesting playlist url-----------')
     playlist = Playlist(args.playlistlink)
     failed = []
-    print(playlist)
+    print(playlist.title)
     if (playlist): #Some issues can occur when youtube changes its access and encoding
-        for videourls in playlist:
+        for vidnum, videourls in enumerate(playlist):
             print(videourls)
-            CurrentVideo = Video(videourls, args.filelocation)
+            CurrentVideo = Video(videourls, args.filelocation, args.includeauth)
             if (CurrentVideo.currentFailed):
+                CurrentVideo.currentFailed.append(vidnum)
                 failed.append(CurrentVideo.currentFailed)
                 print(f'{CurrentVideo.currentFailed}')
             del CurrentVideo
@@ -120,6 +129,7 @@ def PlayList(args):
     else:
         print("Either playlist is empty or something has gone wrong")
     if (failed):
+        print("Some urls failed to download, they will now be stored for ease of re-download")
         outputPath: str = getattr(args, 'filelocation')
         FailedWrite(failed, outputPath)
 
@@ -127,7 +137,7 @@ def PlayList(args):
 def FailedWrite(failed, outputPath):
     header = []
     if not header:
-        header = ["Link", "VideoName", "Artist/Channel", "Latest Error"]
+        header = ["Link", "VideoName", "Artist/Channel", "Latest Error", "PLaylist Video Number"]
     output = outputPath + "/output.csv"
     print(f"output: {output}")
     with open (output, 'w', newline='') as csvfile:
@@ -143,17 +153,18 @@ if __name__ == '__main__':
     parser.add_argument('-p','--playlistlink', type=str, help="Enter the url of the playlist] you want to download ")
     parser.add_argument('-f','--filelocation', type=str, default=".", help="Location where would you like the files saved to")
     parser.add_argument('-a', '--audioconvert', type=str, help="Give a path + name of any MP4 youtube video already downloaded and convert to MP3")
+    parser.add_argument('-i', '--includeauth', type=bool, default=False, help="Currently issues occur with Youtube needing authentication to work, this setting makes it so authentication takes place. Alternatives coming soon.")
     args = parser.parse_args()
-    #GuiMain()
+    #GuiMain() #Possible GUI interface in future
     if (args.link):
-        V1 = Video(args.link, args.filelocation)
+        V1 = Video(args.link, args.filelocation, args.includeauth)
         del V1
     elif (args.playlistlink):
         PlayList(args)
     elif (args.audioconvert):
         AudioConvert(args.audioconvert)
     else:
-        print("must have either a link to one video or playlist")
+        print("must have either a link to one video or playlist using the -l or -p tags respectively. Use -h for more help")
 
 
 """
@@ -172,6 +183,7 @@ python3 -m venv venv
 source venv/bin/activate - Starting venv
 pip install <PackageName>
 pip install -r requirements.txt
+pip install -r requirements.txt --upgrade
 Issues can be caused by none up to date packages, stop this by doing the following:
 python -m pip install --upgrade pytube & python -m pip install --upgrade pip
 python3 -m pip list --format=freeze > requirements.txt
