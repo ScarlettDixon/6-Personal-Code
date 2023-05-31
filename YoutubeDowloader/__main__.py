@@ -12,7 +12,7 @@ from csv import writer
 
 class Video:
     #Initialiser of Video class
-    def __init__ (self,link, fileoutputlocation, auth):
+    def __init__ (self, link, fileoutputlocation, auth):
         self.link = link
         self.filelocation = fileoutputlocation
         self.currentFailed = []
