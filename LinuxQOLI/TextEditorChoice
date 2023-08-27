@@ -1,0 +1,13 @@
+#!/bin/sh
+
+#A script to choose between using text editors
+
+choice=$(echo -e "Nano\nGedit\nCode" | dmenu -i -p "Choose Text Editor")
+
+#echo $choice
+
+if [[ $choice == "Nano" ]]; then nano $1;
+elif [[ $choice == "Gedit" ]]; then gedit $1;
+elif [[ $choice == "Code" ]]; then code $1;
+else exit;
+fi
