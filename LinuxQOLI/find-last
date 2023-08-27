@@ -1,0 +1,24 @@
+#!/bin/sh
+
+#This script is used to add a number of shortcuts for editing the latest changed file within a directory.
+
+
+local LastPath="$(find . -exec stat -c '%Y	%n' {} + | sort -n | cut -f 2 | tail -1)" ;
+local LastDir="$(dirname "$LastPath")" ;
+local LastFile="$(basename "$LastPath")" ;
+#If Input Exists
+if [ -n $1 ] ; then
+    #Input in lower case
+    case "${1,,}" in
+        cd | changedir)											cd $LastDir ; echo "Changed Directory to $LastDir";;
+        cl | changelist) 										cd $LastDir ; echo "Changed Directory to $LastDir, listing directory now:" ; ls -alh ;;
+        echo | echo-pwd | echopwd | pwd | ep | path)			echo $LastPath ;;
+        echo-dir | echodir | echodr | dir | ed)  				echo $LastDir ;;
+        echo-file | echofile | echofl | file | ef)				echo $LastFile ;;
+        git-add | gitadd | ga | gitaddpath | git-add-path)		git add $LastPath ; git status ;;
+        git-add-dir | gitadddir | gad)							git add $LastDir ; git status ;;
+        *)														echo "Path: '$LastPath' has had no valid commands used against it" ;;
+    esac
+else
+    echo "'$1' used as an argument was not successful" ;
+fi

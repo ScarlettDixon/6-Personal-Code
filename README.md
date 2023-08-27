@@ -14,6 +14,8 @@ Uses dmenu to allow a user to choose which text editor to use (nano, gedit, vsco
 Starts and stops the printer service as that can be a good foothold into the system if left open.
 ##### ScreenSwap - 
 For when switching between screens, software exists already to do this but greater control without unnecessary processes was deemed useful.
+##### FindLast - 
+This script is used to add a number of shortcuts for editing the latest changed file within a directory, including echoing details about that file, changing to that directory and adding the file or whole directory to be added to git.
 
 ---	
 ### Projects - 
@@ -33,7 +35,8 @@ I have been interested in developing my networking skills in a more practical se
 
 ---
 ### Pentesting tools (PTTools)- 
-These quick scripts were made to make pentesting easier during competitions or when otherwise training, use of common tools like gobuster or wireshark can be forgotten even after a small time has passed and so having a shorthand can be extremely useful. They Include:
+These quick scripts were made to make pentesting easier during competitions or when otherwise training, use of common tools like gobuster or wireshark can be forgotten even after a small time has passed and so having a shorthand can be extremely useful. 
+They Include:
 ##### Datagatherer - 
 I was aware that this script might never be useful in actual pentesting but I created it to try to gain an understanding of the commands necessary to gather data on a system.
 ##### Go-Bust - 
