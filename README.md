@@ -8,8 +8,8 @@ Having started using arch linux to put myself into a position of learning, I fou
 They include:
 ##### Checksum - 
 Used when downloading software with a checksum as security, takes checksum and file and compares them.
-##### NaorGa - 
-Uses dmenu to allow a user to choose whether to use Nano or gedit when editing.
+##### TextEditorChoice - 
+Uses dmenu to allow a user to choose which text editor to use (nano, gedit, vscode) when editing.
 ##### Printstart - 
 Starts and stops the printer service as that can be a good foothold into the system if left open.
 ##### ScreenSwap - 
