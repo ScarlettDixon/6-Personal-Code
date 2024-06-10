@@ -3,7 +3,8 @@ from pytube import YouTube, Playlist
 from argparse import ArgumentParser
 import urllib
 from mutagen.id3 import ID3, TPE1, TIT2, TRCK, TALB, APIC
-from csv import writer
+from csv import writer, reader, DictReader
+from datetime import datetime
 #import requests
 #from tinytag import TinyTag
 #import music_tag
@@ -26,42 +27,42 @@ class Video:
     def GetDetails(self):
         try:
             self.title = self.video.title
-            print(f'-------Downloading {self.title}-----------')
+            print(f'---Downloading {self.title}---')
             self.author = self.video.author
             self.description = self.video.description
             try:
                 self.thumbnail = self.video.thumbnail_url 
             except Exception as e:
-                self.error = "Failed to gather thumbnail - " + f"{e}"
+                self.error = "Error: Failed to gather thumbnail - " + f"{e}"
                 print(self.error)
                 self.currentFailed = [self.link,'' ,'', self.error]
             self.Link()
         except Exception as e:
-            self.error = "Failed to gather details - " + f"{e}"
+            self.error = "Error: Failed to gather details - " + f"{e}"
             print(self.error)
             self.currentFailed = [self.link,'' ,'', self.error]
             return
     #Processing each individual link
     def Link(self):
-        print(f'-------Audio Only Streams-----------')
+        print(f'---Audio Only Streams---')
         try:
             audiostream=self.video.streams.filter(only_audio=True).first()
             tag = audiostream.itag
             #print(audiostream.itag)
             chosendownload = self.video.streams.get_by_itag(tag)
             VideoOut = chosendownload.download(self.filelocation)
-            print(f'-------Download Successful-----------')
+            print(f'---Download Successful---')
             if(VideoOut):
                 VideoOut = self.AudioConvert(VideoOut)
         except Exception as e:
-            self.error = "No Audio Streams Detected, Skipping - " + f"{e}"
+            self.error = "Error: No Audio Streams Detected, Skipping - " + f"{e}"
             print(self.error)
             if not (self.currentFailed):
                 self.currentFailed = [self.link, self.title ,self.author, self.error]
     #Converting from MP3 to MP4, both in file and metadata    
     def AudioConvert(self, VideoOut):
         try:
-            print(f'-------Converting to MP3-----------')
+            print(f'---Converting to MP3---')
             base, ext = os.path.splitext(VideoOut)
             #print(f'{base} and {ext}')
             Oldfile = base + '.mp4'
@@ -72,10 +73,10 @@ class Video:
                 #ffmpeg -vn -sn -dn -i input.mp4 -codec:a libmp3lame -qscale:a 4 output.mp3
                 #os.rename(VideoOut, NewFile)
                 os.remove(VideoOut)
-                print(f'-------Convertion Successful-----------')
+                print(f'---Convertion Successful---')
                 self.MetadataAddition(NewFile)
             else:
-                print(f"File already exists, skipping")
+                print(f"Information: File already exists, skipping")
                 os.remove(VideoOut)
         except Exception as e:
             self.error = "Failed audio conversion - " + f"{e}"
@@ -85,7 +86,7 @@ class Video:
             return VideoOut
     #Using mutagen to add the MP3 metadata
     def MetadataAddition(self, AudioOut):
-        print(f'-------Adding Metadata-----------')
+        print(f'---Adding Metadata---')
         audio = ID3(AudioOut)
         try:
             #print(f"1: {audio}")
@@ -95,16 +96,16 @@ class Video:
             albumart = urllib.request.urlopen(f'{self.thumbnail}')
             #print(f"{albumart}")
             audio['APIC'] = APIC(
-                  encoding=3,
-                  mime='image/jpeg',
-                  type=3,
-                  desc=u'Cover',
-                  data=albumart.read()
+                encoding=3,
+                mime='image/jpeg',
+                type=3,
+                desc=u'Cover',
+                data=albumart.read()
                 )
             audio.save()
-            print(f'-------Metadata Added-----------')
+            print(f'---Metadata Added---')
         except Exception as e:
-            self.error = "Failed Metadata Addition - " + f"{e}"
+            self.error = "Error: Failed Metadata Addition - " + f"{e}"
             print(self.error)
             if not (self.currentFailed):
                 self.currentFailed = [self.link, self.title ,self.author, self.error]
@@ -112,7 +113,7 @@ class Video:
     
 #Seperate function to deal with playlists (many succesive links)
 def PlayList(args):
-    print(f'-------Ingesting playlist url-----------')
+    print(f'---Ingesting playlist url---')
     playlist = Playlist(args.playlistlink)
     failed = []
     print(playlist.title)
@@ -121,25 +122,47 @@ def PlayList(args):
             print(videourls)
             CurrentVideo = Video(videourls, args.filelocation, args.includeauth)
             if (CurrentVideo.currentFailed):
-                CurrentVideo.currentFailed.append(vidnum)
+                CurrentVideo.currentFailed.insert(0,vidnum)
                 failed.append(CurrentVideo.currentFailed)
                 print(f'{CurrentVideo.currentFailed}')
             del CurrentVideo
-        print(f'-------Playlist Injestion Succesfull-----------')
+        print(f'---Playlist Injestion Succesfull---')
     else:
-        print("Either playlist is empty or something has gone wrong")
+        print("Error: Either playlist is empty or a different error has occurred")
     if (failed):
-        print("Some urls failed to download, they will now be stored for ease of re-download")
-        outputPath: str = getattr(args, 'filelocation')
+        print("Error: Some urls failed to download, they will now be stored for ease of re-download")
+        outputPath: str = getattr(args, 'erroroutputlocation')
         FailedWrite(failed, outputPath)
+
+def ErrorFile(inputerrorpath, fileoutputlocation, erroroutputlocation, includeauth):
+    failed = []
+    with open (inputerrorpath, 'r', newline='') as csvfile:
+        errorReader = DictReader(csvfile)
+        for vidnum, row in enumerate(errorReader):
+            print(f"URL: {row['Link']}")
+            print(f"Video Name: {row['VideoName']}")
+            print(f"Artist/Channel: {row['Artist/Channel']}")
+            print(f"Current Error: {row['Latest Error']}")
+            CurrentErrorVideo = Video(row['Link'], fileoutputlocation, includeauth)
+            if (CurrentErrorVideo.currentFailed):
+                CurrentErrorVideo.currentFailed.insert(0,vidnum)
+                failed.append(CurrentErrorVideo.currentFailed)
+                print(f'New Error Entry: {CurrentErrorVideo.currentFailed}')
+            del CurrentErrorVideo
+        print(f'---Playlist Injestion Succesfull---')
+
+    if (failed):
+        print("Error: Some urls failed to download, they will now be stored for ease of re-download")
+        FailedWrite(failed, erroroutputlocation)
 
 #Created in the event of failure in any area of the playlist script as it may contain many videos and allows a user to manually go back through and fix these issues
 def FailedWrite(failed, outputPath):
     header = []
     if not header:
-        header = ["Link", "VideoName", "Artist/Channel", "Latest Error", "PLaylist Video Number"]
-    output = outputPath + "/output.csv"
-    print(f"output: {output}")
+        header = ["Index","Link","VideoName", "Artist/Channel", "Latest Error"]
+    datetoday=datetime.today().strftime('%Y-%m-%d')
+    output = outputPath + f"/erroroutput-{datetoday}.csv"
+    print(f"Output File Name: {output}")
     with open (output, 'w', newline='') as csvfile:
         failedWriter= writer(csvfile)
         failedWriter.writerow(header)
@@ -147,12 +170,14 @@ def FailedWrite(failed, outputPath):
 
 #Argument parsing
 if __name__ == '__main__':
-    print("Scarlett's Youtube Downloader")
+    print("---Scarlett's Youtube Downloader---")
     parser = ArgumentParser("Youtube Video Downloader")
-    parser.add_argument('-l','--link', type=str, help="Enter the url of the video you want to download ")
-    parser.add_argument('-p','--playlistlink', type=str, help="Enter the url of the playlist] you want to download ")
-    parser.add_argument('-f','--filelocation', type=str, default=".", help="Location where would you like the files saved to")
-    parser.add_argument('-a', '--audioconvert', type=str, help="Give a path + name of any MP4 youtube video already downloaded and convert to MP3")
+    parser.add_argument('-l','--link', type=str, help="Enter the url of the video you want to download.")
+    parser.add_argument('-p','--playlistlink', type=str, help="Enter the url of the playlist you want to download.")
+    parser.add_argument('-e','--errorfile', type=str, help="Enter the location of a previously generated error file to be loaded and downloading re-attempted.")
+    parser.add_argument('-f','--filelocation', type=str, default="Downloads", help="Location where would you like the files saved to.")
+    parser.add_argument('-o','--erroroutputlocation', type=str, default="Outputs", help="Location where would you like the csv with details of any videos that failed to download.")
+    parser.add_argument('-a', '--audioconvert', type=str, help="Give a path + name of any MP4 youtube video already downloaded and convert to MP3.")
     parser.add_argument('-i', '--includeauth', type=bool, default=False, help="Currently issues occur with Youtube needing authentication to work, this setting makes it so authentication takes place. Alternatives coming soon.")
     args = parser.parse_args()
     #GuiMain() #Possible GUI interface in future
@@ -163,8 +188,10 @@ if __name__ == '__main__':
         PlayList(args)
     elif (args.audioconvert):
         AudioConvert(args.audioconvert)
+    elif (args.errorfile):
+        ErrorFile(args.errorfile, args.filelocation, args.erroroutputlocation, args.includeauth)
     else:
-        print("must have either a link to one video or playlist using the -l or -p tags respectively. Use -h for more help")
+        print("Warning: Please provide either a link to one video or playlist using the -l or -p tags respectively. Use -h for more help")
 
 
 """
@@ -191,7 +218,7 @@ python -m pip cache remove <Pattern>
 deactivate
 
 
-print(f'-------Ingesting single video url-----------')
+print(f'---Ingesting single video url---')
     print(args.link)
     video = YouTube(args.link)
     #Title of video
@@ -207,7 +234,7 @@ print(f'-------Ingesting single video url-----------')
     #Rating
     print("Ratings: ",video.rating)
     #printing all the available streams
-    #print(f'-------Streams-----------')
+    #print(f'---Streams---')
     #print(video.streams)
 
     try:
