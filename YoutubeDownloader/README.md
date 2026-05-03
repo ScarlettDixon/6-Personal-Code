@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/github/license/ScarlettDixon/8-Templates.svg)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
-[![language](https://img.shields.io/badge/python-blue?logo=python)](https://www.python.org/)
+[![language](https://img.shields.io/badge/python-yellow?logo=python)](https://www.python.org/)
 
 To keep audio copies of personal youtube videos, I developed a script to download them and convert them to the MP3 format
 

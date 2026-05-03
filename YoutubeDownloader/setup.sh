@@ -16,10 +16,17 @@ testVenvName="test_venv"
 testRequirementLocation="Configuration/test_requirements.txt"
 testScriptLocation="Tests/UnitTesting/test_launch.py"
 
+# Gui Dev Script Vars
+gui="GUI Development"
+guiVenvName="venv"
+guiRequirementLocation="Configuration/requirements.txt"
+guiScriptLocation="Scripts/launch.py"
+
 # Misc Vars
 downloadsLocation="Downloads"
 pythonCommand=python
 pipCommand=pip
+
 
 
 help(){
@@ -30,6 +37,7 @@ Usage: remind [flag]
   -i Initialises the venv environment
   -s Starts the script with no link - useful for debugging
   -l starts the script but includes a youtube link as an argument
+  -v starts the script but includes a youtube link as an argument and produces video
   -p starts the script but includes a playlist link as an argument
   -e starts the script but includes an error file location as an argument
   -t runs the test script, defaults to running the all tests
@@ -69,6 +77,13 @@ function link(){
     script_check "$scriptLocation" "$production" "-l $1 -f $downloadsLocation";
 }
 
+function videolink(){
+    echo "---Running Python Script with given youtube link to produce video---" ;
+    activate_check "$venvName" "$production"
+    echo -e "---Link URL: $1---" ;
+    script_check "$scriptLocation" "$production" "-l $1 -f $downloadsLocation -v True";
+}
+
 function playlist(){
     echo "---Running Python Script over given playlist---" ;
     activate_check "$venvName" "$production"
@@ -81,6 +96,12 @@ function errorfile(){
     activate_check "$venvName" "$production"
     echo -e "---Error File Location: $pwd/$1---" ;
     script_check "$scriptLocation" "$production" "-e $1 -f $downloadsLocation";
+}
+
+function gui(){
+    echo "---Running Python Script for GUI Generation---" ;
+    activate_check "$guiVenvName" "$gui"
+    script_check "$guiScriptLocation" "$gui" "-g True";
 }
 
 function test (){
@@ -102,7 +123,7 @@ function delete (){
 function activate_check (){
     echo "---Activating Virtual Environment---" ;
     if [ ! -d "$1" ]; then #If Virtual Environment Directory Doesn't Exist
-        if [ ${FUNCNAME[1]} == "init" || ${FUNCNAME[1]} == "test" ]; then
+        if [ ${FUNCNAME[1]} == "init" ] || [ ${FUNCNAME[1]} == "test" ]; then
             $pythonCommand -m venv $1 ;
             echo "--- $2 Virtual Environment Created---" ;
         else
@@ -129,13 +150,15 @@ function script_check () {
 }
 
 echo -e "---Youtube Downloader Setup---" ;
-while getopts "dehilpst" options; do #Using getopts for options, no : if no argument
+while getopts "deghilpstv" options; do #Using getopts for options, no : if no argument
 	case "${options}" in                        
 	    i) init "$production";;
         s) start ;;
         l) link "$2" ;;
+        v) videolink "$2" ;;
         p) playlist "$2" ;;
         e) errorfile "$2" ;;
+        g) gui ;;
         t) test ;;
 		d) delete ;;
 		h) help ;;
