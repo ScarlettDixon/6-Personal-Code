@@ -1,23 +1,7 @@
 use <BOSL2/std.scad>
 use <extra/keystone-jack-pieces.scad>
 use <extra/hex-grid.scad>
-
-//ColourWheel
-CWh=[
-    [0,"Fuchsia"],
-    [1,"DarkCyan"],
-    [2,"lime"],
-    [3,"DodgerBlue"],
-    [4,"greenyellow"],
-    [5,"yellow"],
-    [6,"LightCoral"],
-    [7,"red"],
-    [8,"SandyBrown"],
-    [9,"Goldenrod"],
-    [10,"DarkGoldenrod"],
-    [11,"SlateGray"] 
-    ];
-
+include <extra/colorset.scad>
 
 //Offset Function
 function  oset (base, sec) =  (base - sec) / 2;

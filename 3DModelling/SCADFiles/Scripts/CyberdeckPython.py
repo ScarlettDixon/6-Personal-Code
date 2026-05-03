@@ -1,0 +1,91 @@
+import os
+from solid import *
+from solid.objects import *
+from solid.utils import *
+import viewscad as vsc
+
+
+#https://github.com/nickc92/ViewSCAD?tab=readme-ov-file
+#renderer = viewscad.Renderer(openscad_exec='path_of_my_openscad')
+#rend.render(obj)
+
+
+SEGMENTS = 48
+cwd = os.getcwd()
+
+def touch(fname):
+    if os.path.exists(fname):
+        os.utime(fname, None)
+    else:
+        open(fname, 'a').close()
+
+def translate(arr):
+    if (arr[0]>0): #X Value
+        right(X)
+    else:
+        left(X)
+    if (arr[1]>0): #Y Value
+        forward(Y)
+    else:
+        back(Y)
+    if (arr[2]>0): #Z Value
+        up(Z)
+    else:
+        down(Z)
+
+
+#Creating a base traingle and moving it to the an xyz positive postion
+def BaseTri (TX,TY,TZ,COSetY): 
+    use('BOSL/constants.scad')
+    use('BOSL/shapes.scad')
+    BT = translate((TX/2,COSetY+(TY/2),0))(
+        right_triangle([TX,TY,TZ], align='V_UP+V_BACK+V_RIGHT', orient='ORIENT_X', center=False)
+    )
+    return BT
+
+
+
+if __name__ == '__main__':
+    BOSL_2_std = import_scad('BOSL2/std.scad')
+    #test=use('BOSL2/std.scad')
+    #Keystone = import_scad('extra/keystone-jack-pieces.scad')
+    BOSL_Const = import_scad('BOSL/constants.scad')
+    BOSL_Trans = import_scad('BOSL/transforms.scad')
+    BOSL_shape = import_scad('BOSL/shapes.scad')
+    #use('BOSL/shapes.scad')
+    #---Dev Values---
+    CubeFillet=0
+    BaseCntr = "false"
+    #$fn=100
+    #Offsets to match the current Cyberdeck copying
+    COSetY=6.3
+    OffsetBazFz=5
+    
+    #---Bottom Layer---
+    #Base Cubiod Dimensions
+    BAx=45
+    BAy=170
+    BAz=5
+        #Second Layer Cuboid Dimensions
+    BBx=BAx
+    BBy=12
+    BBz=9
+    
+    #Base Triangle Dimensions
+    TAx=BAx
+    TAy=10
+    TAz = 10
+    print(f"Hello World ... {cwd}")
+
+    """ d = difference()(
+        cube(10),  # Note the comma between each element!
+        sphere(15)
+    ) """
+    d=union()(BOSL_shape.cuboid(1) , BaseTri(TAx,TAy,TAz,COSetY))
+    #BOSL_shape.right_triangle([TAx,TAy,TAz], align='V_UP+V_BACK+V_RIGHT', orient='ORIENT_X', center='false'))
+    #translate([Thickness/2,OutY/2,OutZ/2]) + rotate([0,90,0]) + color(CWh[2][1]) (create_grid(size=[OutZ,OutY,Thickness],SW=10,wall=3)) BaseTri(TAx,TAy,TAz,COSetY, BOSL_shape)
+    #rend.render(d)
+    filename='SCAD/cyberdeck-endcap-pyth.scad'
+    os.remove(filename)
+    touch(filename)
+    scad_render_to_file(d, filename)

@@ -1,0 +1,27 @@
+#https://wiki.archlinux.org/title/Desktop_entries
+#desktop-file-validate /usr/share/applications/cadquery.desktop
+[Desktop Entry]
+
+# The type as listed: 
+Type=Application
+
+# The name of the application
+Name=CADQuery cq-editor
+
+# The path to the folder in which the executable is run
+Path=/home/scarlett/cq-editor
+
+# A comment which can/will be used as a tooltip
+Comment=Using CADQuery in the GUI interface cq-editor
+
+# The executable of the application, possibly with arguments.
+Exec=bash run.sh
+
+# The name of the icon that will be used to display this entry
+Icon=Cadquery_module_workbench_icon
+
+# Describes whether this application needs to be run in a terminal or not
+Terminal=false
+
+# Describes the categories in which this entry should be shown
+Categories=Development;GUIDesigner;IDE;
