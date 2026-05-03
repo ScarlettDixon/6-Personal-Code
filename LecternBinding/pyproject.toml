@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Python"
+license = {file = "LICENSE"}
+description = "Python Template"
+readme = {file = "README.md", content-type = "text/markdown"}
+dynamic = ["version"]
+scripts = ["setup.sh"]
+include = ["README.md", "LICENSE"]
+authors = [{ name = "Scarlett Dixon"}]
+maintainers = [{name = "Scarlett Dixon"}]
+keywords = ["python", "template", "help"]
+dependencies = [
+    "numpy == 1.26.4",
+    "structlog == 22.1.0"
+]
+
+# [project.optional-dependencies]
+# dev = [
+#     "",
+# ]
+# test = [
+#     "",
+# ]
+
+# [project.scripts]
+# executable_name = "module_name.script_name:function_name"
