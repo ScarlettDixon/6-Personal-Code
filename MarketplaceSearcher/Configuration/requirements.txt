@@ -1,0 +1,9 @@
+beautifulsoup4
+#openai
+#PyQt5
+selenium
+webdriver_manager
+tk
+pyyaml
+cryptography
+autoscraper
