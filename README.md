@@ -4,7 +4,6 @@
 [![license](https://img.shields.io/github/license/ScarlettDixon/6-Personal-Code.svg)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
-[![language](https://img.shields.io/badge/python-blue?logo=python)](https://www.python.org/)
 
 Code used within my own systems or outside of the scope of work/schooling.
 All information that would give away personal or security dependant details have been stripped from the code.
